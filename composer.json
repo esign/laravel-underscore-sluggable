@@ -3,7 +3,7 @@
     "description": "Generate slugs for esign/laravel-underscore-translatable using spatie/laravel-sluggable.",
     "keywords": [
         "esign",
-        "underscore-sluggable"
+        "underscore-translatable"
     ],
     "homepage": "https://github.com/esign/laravel-underscore-sluggable",
     "license": "MIT",
@@ -17,7 +17,9 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/support": "^10.0|^11.0"
+        "esign/laravel-underscore-translatable": "^1.6",
+        "illuminate/support": "^10.0|^11.0",
+        "spatie/laravel-sluggable": "^3.6"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.5",
