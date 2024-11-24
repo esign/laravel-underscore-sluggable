@@ -1,9 +1,11 @@
 {
     "name": "esign/laravel-underscore-sluggable",
-    "description": "Generate slugs for esign/laravel-underscore-translatable using spatie/laravel-sluggable.",
+    "description": "Generate slugs when saving UnderscoreTranslatable models",
     "keywords": [
         "esign",
-        "underscore-translatable"
+        "underscore-translatable",
+        "spatie",
+        "sluggable"
     ],
     "homepage": "https://github.com/esign/laravel-underscore-sluggable",
     "license": "MIT",
