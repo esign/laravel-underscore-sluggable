@@ -1,8 +1,8 @@
 <?php
 
-namespace :vendor_namespace\Tests;
+namespace Esign\UnderscoreSluggable\Tests;
 
-class :studly_package_nameTest extends TestCase
+class UnderscoreSluggableTest extends TestCase
 {
     /** @test */
     public function test()
