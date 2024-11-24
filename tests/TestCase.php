@@ -16,11 +16,6 @@ abstract class TestCase extends BaseTestCase
         $this->setUpDatabase();
     }
 
-    protected function getPackageProviders($app): array
-    {
-        return [UnderscoreSluggableServiceProvider::class];
-    }
-
     protected function setUpDatabase(): void
     {
         Schema::create('posts', function (Blueprint $table) {

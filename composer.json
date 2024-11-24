@@ -43,16 +43,6 @@
     "config": {
         "sort-packages": true
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Esign\\UnderscoreSluggable\\UnderscoreSluggableServiceProvider"
-            ],
-            "aliases": {
-                "UnderscoreSluggable": "Esign\\UnderscoreSluggable\\Facades\\UnderscoreSluggableFacade"
-            }
-        }
-    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
