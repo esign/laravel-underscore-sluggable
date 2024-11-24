@@ -2,7 +2,6 @@
 
 namespace Esign\UnderscoreSluggable\Tests;
 
-use Esign\UnderscoreSluggable\UnderscoreSluggableServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
