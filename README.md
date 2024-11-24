@@ -77,6 +77,8 @@ class Post extends Model
 }
 ```
 
+For more configuration options, please refer to the [spatie/laravel-sluggable](https://github.com/spatie/laravel-sluggable) documentation.
+
 ### Testing
 
 ```bash
