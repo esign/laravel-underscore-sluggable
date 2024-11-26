@@ -2,8 +2,11 @@
 
 namespace Esign\UnderscoreSluggable\Tests;
 
+use Esign\UnderscoreSluggable\HasTranslatableSlug;
 use Esign\UnderscoreSluggable\Tests\Support\Models\Post;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Sluggable\SlugOptions;
 
@@ -253,5 +256,30 @@ class HasTranslatableSlugTest extends TestCase
         $foundPost = Post::findBySlug('my-first-post');
 
         $this->assertTrue($foundPost->is($post));
+    }
+
+    /** @test */
+    public function it_can_handle_models_not_implementing_the_underscore_translatable_trait()
+    {
+        $postModelClass = new class extends Model {
+            use HasTranslatableSlug;
+
+            public $timestamps = false;
+            protected $guarded = [];
+
+            public function getSlugOptions(): SlugOptions
+            {
+                return SlugOptions::createWithLocales(['en', 'nl'])
+                    ->generateSlugsFrom('title')
+                    ->saveSlugsTo('slug');
+            }
+        };
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The model must use the Esign\UnderscoreTranslatable\UnderscoreTranslatable trait to use the Esign\UnderscoreSluggable\HasTranslatableSlug trait.');
+
+        $post = new $postModelClass();
+        $post->title_en = 'My first post';
+        $post->save();
     }
 }
