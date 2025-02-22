@@ -10,7 +10,7 @@ use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Sluggable\SlugOptions;
 
-class HasTranslatableSlugTest extends TestCase
+final class HasTranslatableSlugTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
