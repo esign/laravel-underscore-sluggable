@@ -15,7 +15,7 @@ class HasTranslatableSlugTest extends TestCase
     use LazilyRefreshDatabase;
 
     #[Test]
-    public function it_can_generate_a_slug_for_multiple_locales()
+    public function it_can_generate_a_slug_for_multiple_locales(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -27,7 +27,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_update_one_of_the_slugs()
+    public function it_can_update_one_of_the_slugs(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -41,7 +41,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_make_the_slug_unique_for_multiple_locales()
+    public function it_can_make_the_slug_unique_for_multiple_locales(): void
     {
         $postA = new Post();
         $postA->title_en = 'My first post';
@@ -58,7 +58,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_generate_a_slug_based_on_multiple_fields()
+    public function it_can_generate_a_slug_based_on_multiple_fields(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -77,7 +77,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_generate_a_slug_based_on_fields_that_are_not_translatable()
+    public function it_can_generate_a_slug_based_on_fields_that_are_not_translatable(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -95,7 +95,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_generate_a_slug_based_on_fields_that_are_not_all_translatable()
+    public function it_can_generate_a_slug_based_on_fields_that_are_not_all_translatable(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -113,7 +113,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_generate_a_slug_using_a_callback()
+    public function it_can_generate_a_slug_using_a_callback(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -137,7 +137,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_overwrites_when_creating_a_model()
+    public function it_can_handle_overwrites_when_creating_a_model(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -151,7 +151,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_overwrites_when_updating_a_model()
+    public function it_can_handle_overwrites_when_updating_a_model(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -167,7 +167,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_overwrites_for_one_item_when_updating_a_post()
+    public function it_can_handle_overwrites_for_one_item_when_updating_a_post(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -182,7 +182,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_overwrites_for_one_item_when_updating_a_post_with_custom_slugs()
+    public function it_can_handle_overwrites_for_one_item_when_updating_a_post_with_custom_slugs(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -198,7 +198,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_duplicates_when_overwriting_a_slug()
+    public function it_can_handle_duplicates_when_overwriting_a_slug(): void
     {
         $postA = new Post();
         $postA->title_en = 'My first post';
@@ -219,7 +219,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_duplicates_when_updating_a_model_for_fields_that_are_not_translatable()
+    public function it_can_handle_duplicates_when_updating_a_model_for_fields_that_are_not_translatable(): void
     {
         $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
             ->generateSlugsFrom(['year'])
@@ -246,7 +246,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_find_models_using_find_by_slug()
+    public function it_can_find_models_using_find_by_slug(): void
     {
         $post = new Post();
         $post->title_en = 'My first post';
@@ -259,7 +259,7 @@ class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
-    public function it_can_handle_models_not_implementing_the_underscore_translatable_trait()
+    public function it_can_handle_models_not_implementing_the_underscore_translatable_trait(): void
     {
         $postModelClass = new class extends Model {
             use HasTranslatableSlug;
