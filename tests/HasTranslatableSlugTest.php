@@ -76,7 +76,7 @@ class HasTranslatableSlugTest extends TestCase
         $this->assertEquals('mijn-eerste-post-belgie', $post->slug_nl);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_a_slug_based_on_fields_that_are_not_translatable()
     {
         $post = new Post();
@@ -218,7 +218,7 @@ class HasTranslatableSlugTest extends TestCase
         $this->assertEquals('mijn-eerste-post-1', $postB->slug_nl);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_duplicates_when_updating_a_model_for_fields_that_are_not_translatable()
     {
         $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
@@ -245,7 +245,7 @@ class HasTranslatableSlugTest extends TestCase
         $this->assertEquals('2025-1', $postB->slug_nl);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_find_models_using_find_by_slug()
     {
         $post = new Post();
@@ -258,7 +258,7 @@ class HasTranslatableSlugTest extends TestCase
         $this->assertTrue($foundPost->is($post));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_models_not_implementing_the_underscore_translatable_trait()
     {
         $postModelClass = new class extends Model {
