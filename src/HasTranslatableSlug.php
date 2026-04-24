@@ -18,11 +18,6 @@ trait HasTranslatableSlug
         return Collection::make($this->slugOptions->translatableLocales);
     }
 
-    protected function getLocale()
-    {
-        return app()->getLocale();
-    }
-
     protected function addSlug(): void
     {
         $this->ensureUnderscoreTranslatable();
