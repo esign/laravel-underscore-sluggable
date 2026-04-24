@@ -292,6 +292,28 @@ final class HasTranslatableSlugTest extends TestCase
     }
 
     #[Test]
+    public function it_can_apply_an_additional_query_when_finding_models_using_find_by_slug(): void
+    {
+        $post = new Post();
+        $post->title_en = 'My first post';
+        $post->title_nl = 'Mijn eerste post';
+        $post->year = '2025';
+        $post->save();
+
+        $foundPost = Post::findBySlug('my-first-post', additionalQuery: function ($query) {
+            $query->where('year', '2025');
+        });
+
+        $this->assertTrue($foundPost->is($post));
+
+        $notFoundPost = Post::findBySlug('my-first-post', additionalQuery: function ($query) {
+            $query->where('year', '2024');
+        });
+
+        $this->assertNull($notFoundPost);
+    }
+
+    #[Test]
     public function it_can_handle_models_not_implementing_the_underscore_translatable_trait(): void
     {
         $postModelClass = new class extends Model {

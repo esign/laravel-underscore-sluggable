@@ -79,6 +79,21 @@ class Post extends Model
 
 For more configuration options, please refer to the [spatie/laravel-sluggable](https://github.com/spatie/laravel-sluggable) documentation.
 
+### Finding a model by slug
+You may use `findBySlug` to retrieve a model by the slug of the active locale.
+
+```php
+$post = Post::findBySlug('my-first-post');
+```
+
+To further scope the query, pass an additional query callback as the third argument:
+
+```php
+$post = Post::findBySlug('my-first-post', ['*'], function ($query) {
+    $query->where('status', 'published');
+});
+```
+
 ### Testing
 
 ```bash

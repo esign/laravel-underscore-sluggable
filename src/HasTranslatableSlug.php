@@ -72,7 +72,7 @@ trait HasTranslatableSlug
         }
     }
 
-    public static function findBySlug(string $slug, array $columns = ['*']): ?self
+    public static function findBySlug(string $slug, array $columns = ['*'], ?callable $additionalQuery = null): ?self
     {
         $modelInstance = new static();
         $field = $modelInstance->getSlugOptions()->slugField;
@@ -81,6 +81,12 @@ trait HasTranslatableSlug
             $field = $modelInstance->getTranslatableAttributeName($field, app()->getLocale());
         }
 
-        return static::query()->where($field, $slug)->first($columns);
+        $query = static::query()->where($field, $slug);
+
+        if ($additionalQuery !== null) {
+            $additionalQuery($query);
+        }
+
+        return $query->first($columns);
     }
 }
