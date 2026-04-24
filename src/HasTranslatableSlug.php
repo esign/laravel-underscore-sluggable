@@ -4,38 +4,53 @@ namespace Esign\UnderscoreSluggable;
 
 use Esign\UnderscoreTranslatable\UnderscoreTranslatable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Traits\Localizable;
+use Illuminate\Support\Str;
 use LogicException;
-use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\Actions\GenerateSlugAction;
+use Spatie\Sluggable\HasTranslatableSlug as BaseHasTranslatableSlug;
+use Spatie\Sluggable\Support\Config;
 
 trait HasTranslatableSlug
 {
-    use HasSlug;
-    use Localizable;
+    use BaseHasTranslatableSlug;
 
     protected function getLocalesForSlug(): Collection
     {
         return Collection::make($this->slugOptions->translatableLocales);
     }
 
+    protected function getLocale()
+    {
+        return app()->getLocale();
+    }
+
     protected function addSlug(): void
     {
         $this->ensureUnderscoreTranslatable();
-        $this->ensureValidSlugOptions();
 
-        $this->getLocalesForSlug()->unique()->each(function ($locale) {
-            $this->withLocale($locale, function () use ($locale) {
+        $action = Config::getAction('generate_slug', GenerateSlugAction::class);
+        $action->ensureValidOptions($this->slugOptions);
+
+        $originalSlugField = $this->slugOptions->slugField;
+
+        $this->getLocalesForSlug()->unique()->each(function ($locale) use ($action, $originalSlugField) {
+            if ($this->slugOptions->preventOverwrite) {
+                if (filled($this->getTranslation($originalSlugField, $locale, false))) {
+                    return;
+                }
+            }
+
+            $this->withLocale($locale, function () use ($locale, $action, $originalSlugField) {
                 // Temorarily change the 'slugField' of the SlugOptions
                 // so following methods like 'generateNonUniqueSlug' and 'makeSlugUnique'
                 // use the underscore-translatable column instead of the 'slugField'.
-                $originalSlugField = $this->slugOptions->slugField;
                 $translatableSlugField = $this->getTranslatableAttributeName($originalSlugField, $locale);
                 $this->slugOptions->saveSlugsTo($translatableSlugField);
 
                 $slug = $this->generateNonUniqueSlug();
 
                 if ($this->slugOptions->generateUniqueSlugs) {
-                    $slug = $this->makeSlugUnique($slug);
+                    $slug = $action->makeUnique($slug, $this, $this->slugOptions);
                 }
 
                 // revert the change for the next iteration
@@ -44,11 +59,6 @@ trait HasTranslatableSlug
                 $this->setTranslation($originalSlugField, $locale, $slug);
             });
         });
-    }
-
-    protected function getSlugSourceStringFromCallable(): string
-    {
-        return call_user_func($this->slugOptions->generateSlugFrom, $this, app()->getLocale());
     }
 
     protected function ensureUnderscoreTranslatable(): void
