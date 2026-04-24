@@ -13,6 +13,10 @@ You can install the package via composer:
 composer require esign/laravel-underscore-sluggable
 ```
 
+## Upgrading
+
+When updating to a new version, check the [upgrade guide](UPGRADING.md).
+
 ## Usage
 To support slug generation for models that use the `UnderscoreTranslatable` trait, you may add the `HasTranslatableSlug` trait to your models.
 Next up, you should define the `getSlugOptions` method on your model, which should be created using the `createWithLocales` method.
