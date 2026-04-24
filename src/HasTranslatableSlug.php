@@ -3,6 +3,7 @@
 namespace Esign\UnderscoreSluggable;
 
 use Esign\UnderscoreTranslatable\UnderscoreTranslatable;
+use Illuminate\Support\Collection;
 use LogicException;
 use Spatie\Sluggable\Actions\GenerateSlugAction;
 use Spatie\Sluggable\HasTranslatableSlug as BaseHasTranslatableSlug;
@@ -11,6 +12,11 @@ use Spatie\Sluggable\Support\Config;
 trait HasTranslatableSlug
 {
     use BaseHasTranslatableSlug;
+
+    protected function getLocalesForSlug(): Collection
+    {
+        return Collection::make($this->slugOptions->translatableLocales);
+    }
 
     protected function getLocale()
     {
