@@ -23,32 +23,46 @@ trait HasTranslatableSlug
         $action = $this->generateSlugAction();
         $action->ensureValidOptions($this->slugOptions);
 
-        $originalSlugField = $this->slugOptions->slugField;
+        $slugField = $this->slugOptions->slugField;
 
-        $this->getLocalesForSlug()->unique()->each(function ($locale) use ($action, $originalSlugField) {
-            if ($this->slugOptions->preventOverwrite && filled($this->getTranslation($originalSlugField, $locale, false))) {
+        $this->getLocalesForSlug()->unique()->each(function ($locale) use ($action, $slugField) {
+            if ($this->slugOptions->preventOverwrite && filled($this->getTranslation($slugField, $locale, false))) {
                 return;
             }
 
-            $this->withLocale($locale, function () use ($locale, $action, $originalSlugField) {
-                // Temorarily change the 'slugField' of the SlugOptions
-                // so following methods like 'generateNonUniqueSlug' and 'makeSlugUnique'
-                // use the underscore-translatable column instead of the 'slugField'.
-                $translatableSlugField = $this->getTranslatableAttributeName($originalSlugField, $locale);
-                $this->slugOptions->saveSlugsTo($translatableSlugField);
-
+            $this->withLocale($locale, function () use ($locale, $action, $slugField) {
                 $slug = $this->generateNonUniqueSlug();
 
                 if ($this->slugOptions->generateUniqueSlugs) {
-                    $slug = $action->makeUnique($slug, $this, $this->slugOptions);
+                    $localeOptions = clone $this->slugOptions;
+                    $localeOptions->saveSlugsTo($this->getTranslatableAttributeName($slugField, $locale));
+                    $slug = $action->makeUnique($slug, $this, $localeOptions);
                 }
 
-                // revert the change for the next iteration
-                $this->slugOptions->saveSlugsTo($originalSlugField);
-
-                $this->setTranslation($originalSlugField, $locale, $slug);
+                $this->setTranslation($slugField, $locale, $slug);
             });
         });
+    }
+
+    protected function getOriginalSourceString(): string
+    {
+        return $this->buildTranslatableSourceString(function (string $fieldName): string {
+            if ($this->isTranslatableAttribute($fieldName)) {
+                return (string) $this->getOriginal(
+                    $this->getTranslatableAttributeName($fieldName, $this->getLocale()),
+                    ''
+                );
+            }
+
+            return (string) $this->getOriginal($fieldName, '');
+        });
+    }
+
+    protected function hasCustomSlugBeenUsed(): bool
+    {
+        $attributeName = $this->getTranslatableAttributeName($this->slugOptions->slugField, $this->getLocale());
+
+        return $this->getOriginal($attributeName) !== $this->getAttribute($attributeName);
     }
 
     protected function ensureUnderscoreTranslatable(): void

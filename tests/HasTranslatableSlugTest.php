@@ -225,11 +225,9 @@ final class HasTranslatableSlugTest extends TestCase
     #[Test]
     public function it_can_handle_duplicates_when_overwriting_a_slug(): void
     {
-        $this->markTestSkipped('This test is currently failing because the "preventOverwrite" option is currently only preventing overwrites when generating a slug, but not when manually setting the slug.');
         $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
             ->generateSlugsFrom('title')
-            ->saveSlugsTo('slug')
-            ->preventOverwrite();
+            ->saveSlugsTo('slug');
 
         $postA = new Post();
         $postA->setSlugOptions($slugOptions);
