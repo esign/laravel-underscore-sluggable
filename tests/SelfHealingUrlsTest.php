@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Sluggable\Actions\BuildSelfHealingRouteKeyAction;
 use Spatie\Sluggable\Exceptions\StaleSelfHealingUrl;
-use Spatie\Sluggable\Facades\Sluggable;
+use Spatie\Sluggable\Facades\SelfHealing;
 
 final class SelfHealingUrlsTest extends TestCase
 {
@@ -155,7 +155,7 @@ final class SelfHealingUrlsTest extends TestCase
         $post->setTranslation('title', 'nl', 'Mijn bijgewerkte post');
         $post->save();
 
-        Sluggable::onStaleSelfHealingUrl(function (Model $model, string $staleRouteKey, Request $request) {
+        SelfHealing::onStaleSelfHealingUrl(function (Model $model, string $staleRouteKey, Request $request) {
             return response("stale:{$staleRouteKey}:canonical:{$model->getRouteKey()}", 418);
         });
 

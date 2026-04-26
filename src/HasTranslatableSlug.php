@@ -5,9 +5,7 @@ namespace Esign\UnderscoreSluggable;
 use Esign\UnderscoreTranslatable\UnderscoreTranslatable;
 use Illuminate\Support\Collection;
 use LogicException;
-use Spatie\Sluggable\Actions\GenerateSlugAction;
 use Spatie\Sluggable\HasTranslatableSlug as BaseHasTranslatableSlug;
-use Spatie\Sluggable\Support\Config;
 
 trait HasTranslatableSlug
 {
@@ -22,16 +20,14 @@ trait HasTranslatableSlug
     {
         $this->ensureUnderscoreTranslatable();
 
-        $action = Config::getAction('generate_slug', GenerateSlugAction::class);
+        $action = $this->generateSlugAction();
         $action->ensureValidOptions($this->slugOptions);
 
         $originalSlugField = $this->slugOptions->slugField;
 
         $this->getLocalesForSlug()->unique()->each(function ($locale) use ($action, $originalSlugField) {
-            if ($this->slugOptions->preventOverwrite) {
-                if (filled($this->getTranslation($originalSlugField, $locale, false))) {
-                    return;
-                }
+            if ($this->slugOptions->preventOverwrite && filled($this->getTranslation($originalSlugField, $locale, false))) {
+                return;
             }
 
             $this->withLocale($locale, function () use ($locale, $action, $originalSlugField) {
