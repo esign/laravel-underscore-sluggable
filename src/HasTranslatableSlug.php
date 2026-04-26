@@ -76,6 +76,21 @@ trait HasTranslatableSlug
         }
     }
 
+    public function getLocalizedRouteKey(string $locale): mixed
+    {
+        $this->ensureUnderscoreTranslatable();
+
+        $originalLocale = $this->translationLocale;
+
+        try {
+            $this->setLocale($locale);
+
+            return $this->getRouteKey();
+        } finally {
+            $this->setLocale($originalLocale);
+        }
+    }
+
     public static function findBySlug(string $slug, array $columns = ['*'], ?callable $additionalQuery = null): ?self
     {
         $modelInstance = new static();

@@ -6,7 +6,7 @@ use Esign\UnderscoreSluggable\HasTranslatableSlug;
 use Esign\UnderscoreSluggable\Tests\Support\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Sluggable\SlugOptions;
@@ -287,6 +287,28 @@ final class HasTranslatableSlugTest extends TestCase
         $foundPost = Post::findBySlug('my-first-post');
 
         $this->assertTrue($foundPost->is($post));
+    }
+
+    #[Test]
+    public function it_can_get_a_localized_route_key_and_restore_the_previous_locale(): void
+    {
+        App::setLocale('en');
+
+        $post = new Post();
+        $post->title_en = 'My first post';
+        $post->title_nl = 'Mijn eerste post';
+        $post->save();
+
+        $this->assertSame('en', $post->getLocale());
+        $this->assertSame('mijn-eerste-post', $post->getLocalizedRouteKey('nl'));
+        $this->assertSame('en', $post->getLocale());
+        $this->assertSame('my-first-post', $post->slug);
+
+        $post->setLocale('en');
+
+        $this->assertSame('mijn-eerste-post', $post->getLocalizedRouteKey('nl'));
+        $this->assertSame('en', $post->getLocale());
+        $this->assertSame('my-first-post', $post->slug);
     }
 
     #[Test]

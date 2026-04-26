@@ -2,6 +2,7 @@
 
 namespace Esign\UnderscoreSluggable\Tests;
 
+use Esign\UnderscoreSluggable\Tests\Support\Models\DefaultRouteKeyPost;
 use Esign\UnderscoreSluggable\Tests\Support\Models\SelfHealingTranslatablePost;
 use Esign\UnderscoreSluggable\Tests\Support\Models\Post;
 use Illuminate\Database\Eloquent\Model;
@@ -40,7 +41,7 @@ final class SelfHealingUrlsTest extends TestCase
     #[Test]
     public function it_falls_back_to_the_parent_route_key_when_self_healing_is_disabled(): void
     {
-        $post = new Post();
+        $post = new DefaultRouteKeyPost();
         $post->title_en = 'My first post';
         $post->title_nl = 'Mijn eerste post';
         $post->save();
