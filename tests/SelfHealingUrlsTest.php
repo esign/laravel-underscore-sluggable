@@ -127,7 +127,7 @@ final class SelfHealingUrlsTest extends TestCase
 
         $response = $this->get("/posts/my-first-post-{$post->id}");
 
-        $response->assertStatus(301);
+        $response->assertStatus(308);
         $response->assertRedirect("/posts/my-updated-post-{$post->id}");
     }
 
@@ -212,7 +212,7 @@ final class SelfHealingUrlsTest extends TestCase
 
         $response = $this->get("/posts/my-first-post-{$post->id}");
 
-        $response->assertStatus(301);
+        $response->assertStatus(308);
         $response->assertRedirect("/posts/my-updated-post-{$post->id}");
     }
 }
