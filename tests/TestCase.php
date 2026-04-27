@@ -5,6 +5,7 @@ namespace Esign\UnderscoreSluggable\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Spatie\Sluggable\SluggableServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -13,6 +14,13 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->setUpDatabase();
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            SluggableServiceProvider::class,
+        ];
     }
 
     protected function setUpDatabase(): void

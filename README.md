@@ -13,6 +13,10 @@ You can install the package via composer:
 composer require esign/laravel-underscore-sluggable
 ```
 
+## Upgrading
+
+When updating to a new version, check the [upgrade guide](UPGRADING.md).
+
 ## Usage
 To support slug generation for models that use the `UnderscoreTranslatable` trait, you may add the `HasTranslatableSlug` trait to your models.
 Next up, you should define the `getSlugOptions` method on your model, which should be created using the `createWithLocales` method.
@@ -78,6 +82,21 @@ class Post extends Model
 ```
 
 For more configuration options, please refer to the [spatie/laravel-sluggable](https://github.com/spatie/laravel-sluggable) documentation.
+
+### Finding a model by slug
+You may use `findBySlug` to retrieve a model by the slug of the active locale.
+
+```php
+$post = Post::findBySlug('my-first-post');
+```
+
+To further scope the query, pass an additional query callback as the third argument:
+
+```php
+$post = Post::findBySlug('my-first-post', ['*'], function ($query) {
+    $query->where('status', 'published');
+});
+```
 
 ### Testing
 

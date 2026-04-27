@@ -4,14 +4,12 @@ namespace Esign\UnderscoreSluggable;
 
 use Esign\UnderscoreTranslatable\UnderscoreTranslatable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Traits\Localizable;
 use LogicException;
-use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\HasTranslatableSlug as BaseHasTranslatableSlug;
 
 trait HasTranslatableSlug
 {
-    use HasSlug;
-    use Localizable;
+    use BaseHasTranslatableSlug;
 
     protected function getLocalesForSlug(): Collection
     {
@@ -21,34 +19,50 @@ trait HasTranslatableSlug
     protected function addSlug(): void
     {
         $this->ensureUnderscoreTranslatable();
-        $this->ensureValidSlugOptions();
 
-        $this->getLocalesForSlug()->unique()->each(function ($locale) {
-            $this->withLocale($locale, function () use ($locale) {
-                // Temorarily change the 'slugField' of the SlugOptions
-                // so following methods like 'generateNonUniqueSlug' and 'makeSlugUnique'
-                // use the underscore-translatable column instead of the 'slugField'.
-                $originalSlugField = $this->slugOptions->slugField;
-                $translatableSlugField = $this->getTranslatableAttributeName($originalSlugField, $locale);
-                $this->slugOptions->saveSlugsTo($translatableSlugField);
+        $action = $this->generateSlugAction();
+        $action->ensureValidOptions($this->slugOptions);
 
+        $slugField = $this->slugOptions->slugField;
+
+        $this->getLocalesForSlug()->unique()->each(function ($locale) use ($action, $slugField) {
+            if ($this->slugOptions->preventOverwrite && filled($this->getTranslation($slugField, $locale, false))) {
+                return;
+            }
+
+            $this->withLocale($locale, function () use ($locale, $action, $slugField) {
                 $slug = $this->generateNonUniqueSlug();
 
                 if ($this->slugOptions->generateUniqueSlugs) {
-                    $slug = $this->makeSlugUnique($slug);
+                    $localeOptions = clone $this->slugOptions;
+                    $localeOptions->saveSlugsTo($this->getTranslatableAttributeName($slugField, $locale));
+                    $slug = $action->makeUnique($slug, $this, $localeOptions);
                 }
 
-                // revert the change for the next iteration
-                $this->slugOptions->saveSlugsTo($originalSlugField);
-
-                $this->setTranslation($originalSlugField, $locale, $slug);
+                $this->setTranslation($slugField, $locale, $slug);
             });
         });
     }
 
-    protected function getSlugSourceStringFromCallable(): string
+    protected function getOriginalSourceString(): string
     {
-        return call_user_func($this->slugOptions->generateSlugFrom, $this, app()->getLocale());
+        return $this->buildTranslatableSourceString(function (string $fieldName): string {
+            if ($this->isTranslatableAttribute($fieldName)) {
+                return (string) $this->getOriginal(
+                    $this->getTranslatableAttributeName($fieldName, $this->getLocale()),
+                    ''
+                );
+            }
+
+            return (string) $this->getOriginal($fieldName, '');
+        });
+    }
+
+    protected function hasCustomSlugBeenUsed(): bool
+    {
+        $attributeName = $this->getTranslatableAttributeName($this->slugOptions->slugField, $this->getLocale());
+
+        return $this->getOriginal($attributeName) !== $this->getAttribute($attributeName);
     }
 
     protected function ensureUnderscoreTranslatable(): void
@@ -62,7 +76,7 @@ trait HasTranslatableSlug
         }
     }
 
-    public static function findBySlug(string $slug, array $columns = ['*']): ?self
+    public static function findBySlug(string $slug, array $columns = ['*'], ?callable $additionalQuery = null): ?self
     {
         $modelInstance = new static();
         $field = $modelInstance->getSlugOptions()->slugField;
@@ -71,6 +85,12 @@ trait HasTranslatableSlug
             $field = $modelInstance->getTranslatableAttributeName($field, app()->getLocale());
         }
 
-        return static::query()->where($field, $slug)->first($columns);
+        $query = static::query()->where($field, $slug);
+
+        if ($additionalQuery !== null) {
+            $additionalQuery($query);
+        }
+
+        return $query->first($columns);
     }
 }
