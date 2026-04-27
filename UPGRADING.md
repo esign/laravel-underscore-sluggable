@@ -2,7 +2,11 @@
 
 ## From v1 to v2
 
-The `findBySlug` method now accepts an optional `additionalQuery` callback parameter, aligning behavior with the upstream Spatie API. This allows consumers to constrain slug lookups without writing custom query logic.
+### Dependency changes
+
+- **PHP 8.3** is now the minimum required version. PHP 8.1 and 8.2 are no longer supported.
+- **Laravel 12** is now the minimum required version. Laravel 11 is no longer supported.
+- **`spatie/laravel-sluggable` v4** is now required. Please refer to the [spatie/laravel-sluggable upgrade guide](https://github.com/spatie/laravel-sluggable/blob/main/UPGRADING.md) for details on upstream breaking changes.
 
 ### Method changes
 
