@@ -13,6 +13,10 @@ You can install the package via composer:
 composer require esign/laravel-underscore-sluggable
 ```
 
+## Upgrading
+
+When updating to a new version, check the [upgrade guide](UPGRADING.md).
+
 ## Usage
 To support slug generation for models that use the `UnderscoreTranslatable` trait, you may add the `HasTranslatableSlug` trait to your models.
 Next up, you should define the `getSlugOptions` method on your model, which should be created using the `createWithLocales` method.
@@ -78,6 +82,38 @@ class Post extends Model
 ```
 
 For more configuration options, please refer to the [spatie/laravel-sluggable](https://github.com/spatie/laravel-sluggable) documentation.
+
+### Self-healing URLs
+Self-healing URLs combine the slug with the model's primary key (e.g. `hello-world-5`). When the slug changes, requests to the old URL are automatically redirected with a `308` to the canonical URL — so existing links never break.
+
+Enable it by calling `->selfHealing()` on your `SlugOptions`:
+
+```php
+public function getSlugOptions(): SlugOptions
+{
+    return SlugOptions::createWithLocales(['en', 'nl'])
+        ->generateSlugsFrom('title')
+        ->saveSlugsTo('slug')
+        ->selfHealing();
+}
+```
+
+With this in place, route model binding will resolve `hello-world-5` to the correct model. If the slug portion is stale (e.g. `old-title-5`), Laravel will issue a `308 Permanent Redirect` to the current canonical URL.
+
+### Finding a model by slug
+You may use `findBySlug` to retrieve a model by the slug of the active locale.
+
+```php
+$post = Post::findBySlug('my-first-post');
+```
+
+To further scope the query, pass an additional query callback as the third argument:
+
+```php
+$post = Post::findBySlug('my-first-post', ['*'], function ($query) {
+    $query->where('status', 'published');
+});
+```
 
 ### Testing
 

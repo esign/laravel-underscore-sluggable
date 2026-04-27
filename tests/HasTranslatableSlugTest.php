@@ -6,6 +6,7 @@ use Esign\UnderscoreSluggable\HasTranslatableSlug;
 use Esign\UnderscoreSluggable\Tests\Support\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\App;
 use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Sluggable\SlugOptions;
@@ -139,7 +140,13 @@ final class HasTranslatableSlugTest extends TestCase
     #[Test]
     public function it_can_handle_overwrites_when_creating_a_model(): void
     {
+        $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->preventOverwrite();
+
         $post = new Post();
+        $post->setSlugOptions($slugOptions);
         $post->title_en = 'My first post';
         $post->title_nl = 'Mijn eerste post';
         $post->slug_en = 'my-updated-post';
@@ -153,7 +160,13 @@ final class HasTranslatableSlugTest extends TestCase
     #[Test]
     public function it_can_handle_overwrites_when_updating_a_model(): void
     {
+        $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->preventOverwrite();
+
         $post = new Post();
+        $post->setSlugOptions($slugOptions);
         $post->title_en = 'My first post';
         $post->title_nl = 'Mijn eerste post';
         $post->save();
@@ -169,7 +182,13 @@ final class HasTranslatableSlugTest extends TestCase
     #[Test]
     public function it_can_handle_overwrites_for_one_item_when_updating_a_post(): void
     {
+        $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->preventOverwrite();
+
         $post = new Post();
+        $post->setSlugOptions($slugOptions);
         $post->title_en = 'My first post';
         $post->title_nl = 'Mijn eerste post';
         $post->save();
@@ -184,7 +203,13 @@ final class HasTranslatableSlugTest extends TestCase
     #[Test]
     public function it_can_handle_overwrites_for_one_item_when_updating_a_post_with_custom_slugs(): void
     {
+        $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->preventOverwrite();
+
         $post = new Post();
+        $post->setSlugOptions($slugOptions);
         $post->title_en = 'My first post';
         $post->title_nl = 'Mijn eerste post';
         $post->slug_en = 'my-updated-post';
@@ -193,19 +218,25 @@ final class HasTranslatableSlugTest extends TestCase
         $post->slug_nl = 'mijn-aangepaste-post';
         $post->save();
 
-        $this->assertEquals('my-first-post', $post->slug_en);
+        $this->assertEquals('my-updated-post', $post->slug_en);
         $this->assertEquals('mijn-aangepaste-post', $post->slug_nl);
     }
 
     #[Test]
     public function it_can_handle_duplicates_when_overwriting_a_slug(): void
     {
+        $slugOptions = SlugOptions::createWithLocales(['en', 'nl'])
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug');
+
         $postA = new Post();
+        $postA->setSlugOptions($slugOptions);
         $postA->title_en = 'My first post';
         $postA->title_nl = 'Mijn eerste post';
         $postA->save();
 
         $postB = new Post();
+        $postB->setSlugOptions($slugOptions);
         $postB->title_en = 'My second post';
         $postB->title_nl = 'Mijn tweede post';
         $postB->save();
@@ -256,6 +287,50 @@ final class HasTranslatableSlugTest extends TestCase
         $foundPost = Post::findBySlug('my-first-post');
 
         $this->assertTrue($foundPost->is($post));
+    }
+
+    #[Test]
+    public function it_can_get_a_localized_route_key_and_restore_the_previous_locale(): void
+    {
+        App::setLocale('en');
+
+        $post = new Post();
+        $post->title_en = 'My first post';
+        $post->title_nl = 'Mijn eerste post';
+        $post->save();
+
+        $this->assertSame('en', $post->getLocale());
+        $this->assertSame('mijn-eerste-post', $post->getLocalizedRouteKey('nl'));
+        $this->assertSame('en', $post->getLocale());
+        $this->assertSame('my-first-post', $post->slug);
+
+        $post->setLocale('en');
+
+        $this->assertSame('mijn-eerste-post', $post->getLocalizedRouteKey('nl'));
+        $this->assertSame('en', $post->getLocale());
+        $this->assertSame('my-first-post', $post->slug);
+    }
+
+    #[Test]
+    public function it_can_apply_an_additional_query_when_finding_models_using_find_by_slug(): void
+    {
+        $post = new Post();
+        $post->title_en = 'My first post';
+        $post->title_nl = 'Mijn eerste post';
+        $post->year = '2025';
+        $post->save();
+
+        $foundPost = Post::findBySlug('my-first-post', additionalQuery: function ($query) {
+            $query->where('year', '2025');
+        });
+
+        $this->assertTrue($foundPost->is($post));
+
+        $notFoundPost = Post::findBySlug('my-first-post', additionalQuery: function ($query) {
+            $query->where('year', '2024');
+        });
+
+        $this->assertNull($notFoundPost);
     }
 
     #[Test]
